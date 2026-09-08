@@ -1,5 +1,7 @@
 /.phpunit.cache
 /node_modules
+/tmp/video-tools/
+/tmp/reference-contact-sheet.jpg
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
