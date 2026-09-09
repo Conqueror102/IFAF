@@ -11,19 +11,7 @@
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="site-header">
-        <a class="brand" href="#" aria-label="IFAF home">
-            <span class="brand-mark">IFAF</span>
-            <span class="brand-name">International Food<br>and Arts Festival</span>
-        </a>
-        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" data-menu-toggle>
-            <span class="sr-only">Open navigation</span><i></i><i></i>
-        </button>
-        <nav class="site-nav" id="site-navigation" aria-label="Main navigation" data-navigation>
-            <a href="#about">About</a><a href="#experience">Experience</a><a href="#programme">Programme</a><a href="#contact">Contact</a>
-            <a class="ticket-link" href="#tickets">Get tickets <span aria-hidden="true">↗</span></a>
-        </nav>
-    </header>
+    @include('partials.header')
     <main id="main-content">
         <section class="hero" aria-labelledby="hero-title">
             <div class="hero-copy">
@@ -48,7 +36,14 @@
                     <a class="text-link" href="#about">Discover IFAF <span aria-hidden="true">↓</span></a>
                 </div>
             </div>
-            <img class="hero-people" src="/images/ifaf-hero-cultural-frame-v2.png" alt="People from many countries wearing traditional cultural attire">
+            <div class="hero-people hero-carousel" aria-label="People, food, music and art from around the world">
+                @foreach ([['ifaf-hero-cultural-frame-v2.png', 'ifaf-hero-mobile.png', 'People from many countries wearing traditional cultural attire'], ['ifaf-hero-food-desktop.png', 'ifaf-hero-food-mobile.png', 'A U-shaped feast of dishes from across the continents'], ['ifaf-hero-music-desktop.png', 'ifaf-hero-music-mobile.png', 'A U-shaped arrangement of musical instruments from across the continents'], ['ifaf-hero-art-desktop.png', 'ifaf-hero-art-mobile.png', 'A U-shaped collection of art, ceramics and textiles from across the continents']] as $slide)
+                    <picture class="hero-slide {{ $loop->first ? 'is-active' : '' }}" data-hero-slide aria-hidden="{{ $loop->first ? 'false' : 'true' }}">
+                        <source media="(max-width: 760px)" srcset="{{ asset('images/'.$slide[1]) }}">
+                        <img src="{{ asset('images/'.$slide[0]) }}" alt="{{ $slide[2] }}" fetchpriority="{{ $loop->first ? 'high' : 'low' }}">
+                    </picture>
+                @endforeach
+            </div>
             <div class="event-strip" aria-label="Event information">
                 <div class="event-detail">
                     <img src="https://img.icons8.com/dotty/96/D8A646/calendar.png" alt="">
@@ -61,8 +56,8 @@
                 <p class="event-note">One city. Many worlds.<br>One unforgettable day.</p>
             </div>
         </section>
-        <section class="intro-section" id="about" style="background-image: url('{{ asset('images/ifaf-lagos-gold-background.png') }}')">
-            <p class="section-kicker welcome-wordmark"><span>Welcome to</span><img src="{{ asset('images/ifaf-flags-wordmark-white.png') }}" alt="IFAF" width="1693" height="929" loading="lazy"></p>
+        <section class="intro-section" id="about" style="--welcome-desktop: url('{{ asset('images/ifaf-lagos-gold-background.png') }}'); --welcome-mobile: url('{{ asset('images/ifaf-lagos-mobile.png') }}')">
+            <p class="section-kicker welcome-wordmark"><span>Welcome to</span><img src="{{ asset('images/brand/ifaf-primary.png') }}" alt="IFAF" width="575" height="282" loading="lazy"></p>
             <h2>Where every culture<br>has a seat at the table.</h2>
             <p>Come for the flavours. Stay for the stories, performances and connections that make our world feel closer.</p>
         </section>
@@ -97,6 +92,7 @@
                 <button type="button" data-album-next aria-label="Next photo">→</button>
             </div>
             <p class="album-hint">Turn through the celebration · Tap the front photo to expand</p>
+            <p class="gallery-page-link"><a class="text-link" href="{{ route('gallery') }}">Explore the gallery <span aria-hidden="true">↗</span></a></p>
             <p class="gallery-disclosure">Illustrative festival scenes. Past-event photography coming soon.</p>
             <dialog class="gallery-dialog" aria-label="Festival image preview">
                 <button class="gallery-close" type="button" aria-label="Close image preview">×</button>
@@ -106,7 +102,10 @@
         </section>
         <section class="culture-circle-section" aria-labelledby="culture-circle-title">
             <div class="culture-circle-art">
+                <picture>
+                    <source media="(max-width: 760px)" srcset="{{ asset('images/ifaf-culture-circle-mobile.png') }}" width="1122" height="1402">
                 <img src="{{ asset('images/ifaf-culture-circle.png') }}" alt="Illustrative circular collage of global food, painting, textiles, music, dance and friends sharing a meal" width="1672" height="941" loading="lazy">
+                </picture>
             </div>
             <div class="culture-circle-copy">
                 <p class="culture-circle-kicker">Different roots. Shared joy.</p>
@@ -166,12 +165,12 @@
                         </button>
                     @endforeach
                 </div>
-                <p class="ticket-draft-note">Sample ticket options and prices · Subject to confirmation</p>
+                <p class="ticket-draft-note">{{ $demoMode ? 'Demo ticket options and prices · Do not make real payments' : 'Food included with every ticket' }}</p>
                 <div class="pass-top-label"><span>THE WORLD MEETS IN LAGOS</span><span aria-hidden="true">↘</span></div>
                 <article class="festival-pass" aria-labelledby="pass-title">
                     <div class="pass-main" style="--ticket-pattern: url('{{ asset('images/ifaf-ticket-pattern.png') }}')">
                         <div class="pass-brand-row">
-                            <span class="pass-wordmark">IFAF</span>
+                            <img class="official-logo pass-logo" src="{{ asset('images/brand/ifaf-black.png') }}" alt="IFAF" width="575" height="282">
                             <span class="pass-edition">LAGOS<br><strong>2026</strong></span>
                         </div>
                         <p class="pass-event-name">International Food &amp; Arts Festival</p>
@@ -192,45 +191,14 @@
                     <div class="pass-perforation" aria-hidden="true"></div>
                     <div class="pass-stub">
                         <div class="pass-price-row" aria-live="polite" aria-atomic="true"><span>Total · <span data-pass-name>{{ config('ifaf.tickets.0.name') }}</span></span><strong data-pass-price>₦{{ number_format(config('ifaf.tickets.0.price')) }}</strong></div>
-                        <button class="pass-checkout" type="button" disabled>Bank transfer coming soon <span aria-hidden="true">↗</span></button>
-                        <p class="pass-sales-note">Bookings are not open yet. Verified bank details and payment instructions will appear here.</p>
+                        <a class="pass-checkout" href="{{ route('booking.create') }}" data-reserve-link>Reserve your ticket <span aria-hidden="true">↗</span></a>
+                        <p class="pass-sales-note">Reserve your place, submit a bank transfer receipt, then receive your ticket after approval.</p>
                     </div>
                 </article>
                 <p class="pass-bottom-note">Different roots. Shared joy. <span>One IFAF.</span></p>
             </div>
         </section>
     </main>
-    <footer class="site-footer" id="contact" aria-label="Festival information">
-        <div class="footer-invitation">
-            <p>Your culture.<br><span>Your people. Your place.</span></p>
-            <a class="footer-ticket-button" href="#tickets">Choose your ticket <span aria-hidden="true">↗</span></a>
-        </div>
-        <div class="footer-information">
-            <div class="footer-about">
-                <p class="footer-label">International Food &amp; Arts Festival</p>
-                <p>Bridging the divide.<br>Connecting cultures.</p>
-                <p class="footer-organiser">Powered by<br><strong>The Elevation Church, Ikoyi</strong></p>
-            </div>
-            <nav class="footer-navigation" aria-label="Footer navigation">
-                <p class="footer-label">Explore IFAF</p>
-                <a href="#about">About the festival</a>
-                <a href="#experience">A taste of IFAF</a>
-                <a href="#ticket-inclusions">What’s included</a>
-                <a href="#tickets">Tickets</a>
-            </nav>
-            <div class="footer-visit">
-                <p class="footer-label">Meet us in Lagos</p>
-                <p><time datetime="2026-10-03">Saturday, 3 October 2026</time></p>
-                <address><strong>Strong Tower Hall</strong><br>40 Alfred Rewane Road<br>Ikoyi, Lagos</address>
-                <a class="footer-directions" href="https://www.google.com/maps/search/?api=1&amp;query=Strong+Tower+Hall+40+Alfred+Rewane+Road+Ikoyi+Lagos" target="_blank" rel="noopener noreferrer">Get directions <span aria-hidden="true">↗</span><span class="sr-only"> (opens in a new tab)</span></a>
-            </div>
-        </div>
-        <a class="footer-wordmark" href="#" aria-label="IFAF — back to top">IFAF<span aria-hidden="true">✦</span></a>
-        <div class="footer-bottom">
-            <span>© 2026 International Food and Arts Festival</span>
-            <a href="https://icons8.com" target="_blank" rel="noopener noreferrer">Icons by Icons8</a>
-            <a href="#">Back to top ↑</a>
-        </div>
-    </footer>
+    @include('partials.footer')
 </body>
 </html>
